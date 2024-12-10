@@ -101,8 +101,8 @@ class Selector:
 
     CATEGORY = _CATEGORY
     FUNCTION = "select"
-    RETURN_NAMES = ("SCORES", "IMAGES", "LATENTS", "MASKS")
-    RETURN_TYPES = ("STRING", "IMAGE", "LATENT", "MASK")
+    RETURN_NAMES = ("SCORES", "IMAGES", "LATENTS", "MASKS", "INDEXES")
+    RETURN_TYPES = ("STRING", "IMAGE", "LATENT", "MASK", "STRING")
 
     def select(
         self,
@@ -134,6 +134,7 @@ class Selector:
         scores = scores.cpu().tolist()
         scores = {k: v for k, v in enumerate(scores) if v >= threshold}
         scores = sorted(scores.items(), key=lambda k: k[1], reverse=True)[:limit]
+        indexes = ",".join([str(v[0]) for v in scores])
         scores_str = ", ".join([str(round(v, 3)) for k, v in scores])
 
         if images is not None:
@@ -152,7 +153,7 @@ class Selector:
         if images is None and latents is None and masks is None:
             raise InterruptProcessingException()
 
-        return (scores_str, images, latents, masks)
+        return (scores_str, images, latents, masks, indexes)
 
 
 NODE_CLASS_MAPPINGS = {
